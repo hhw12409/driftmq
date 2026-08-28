@@ -80,26 +80,26 @@ public class ClientIntegrationTest {
             List<ConsumerRecord> first = con.poll(5);
             Assert.assertEquals(5, first.size(), "첫 5개");
             con.ack(first.get(0).offset());
-            con.ack(first.get(1).offset()); // 0,1 만 ACK, 2,3,4 는 미ACK 상태로 연결 끊음
+            con.ack(first.get(1).offset()); // 0,1 만 ACK — 2..9 는 미ACK 상태로 연결 끊음
         }
         try (DriftClient c2 = mq.connect()) {
             Consumer con = c2.newConsumer("orders", "worker");
-            List<ConsumerRecord> resumed = drain(con, 8, 3000);
-            Assert.assertEquals(8L, resumed.size(), "재연결 후 미ACK(2..9) 재개");
-            Assert.assertEquals(2, resumed.get(0).offset(), "2 부터");
+            // 서버 측 연결-종료 rewind 는 비동기다. race 로 rewind 이전 배치(5..9)를 먼저 볼 수 있으므로
+            // (at-least-once — 중복 수신은 허용) 정확한 개수가 아니라 커버리지를 검증한다:
+            // 미ACK 2..9 는 전부 재전달되고, ACK 한 0·1 은 다시 오지 않는다.
+            java.util.Set<Long> seen = new java.util.HashSet<>();
+            long deadline = System.currentTimeMillis() + 5000;
+            while (System.currentTimeMillis() < deadline) {
+                for (ConsumerRecord r : con.poll(100)) seen.add(r.offset());
+                if (java.util.stream.LongStream.rangeClosed(2, 9).allMatch(seen::contains)) break;
+                Thread.sleep(20);
+            }
+            for (long o = 2; o <= 9; o++) {
+                Assert.assertTrue(seen.contains(o), "재연결 후 미ACK offset " + o + " 재전달");
+            }
+            Assert.assertFalse(seen.contains(0L), "ACK 한 0 은 다시 오지 않음");
+            Assert.assertFalse(seen.contains(1L), "ACK 한 1 은 다시 오지 않음");
         }
-    }
-
-    /** 서버 측 연결-종료 rewind 는 비동기 — count 개를 모을 때까지 짧게 재시도한다. */
-    static List<ConsumerRecord> drain(Consumer c, int count, long timeoutMillis) throws InterruptedException {
-        List<ConsumerRecord> out = new java.util.ArrayList<>();
-        long deadline = System.currentTimeMillis() + timeoutMillis;
-        while (out.size() < count && System.currentTimeMillis() < deadline) {
-            List<ConsumerRecord> batch = c.poll(count);
-            if (batch.isEmpty()) Thread.sleep(25);
-            else out.addAll(batch);
-        }
-        return out;
     }
 
     public void testTwoConsumersIndependentPositions() throws Exception {

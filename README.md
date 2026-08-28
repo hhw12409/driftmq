@@ -177,7 +177,6 @@ src/main/java/io/driftmq/
 ```
 
 `build.gradle.kts` 는 배포·의존성용, `build.sh`/`test.sh` 는 JDK 만으로 도는 최소 경로 — 둘 다 유지된다.
-릴리스 절차는 [`RELEASING.md`](RELEASING.md).
 
 ---
 

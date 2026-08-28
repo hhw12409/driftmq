@@ -8,6 +8,7 @@ _workspace
 _workspace_*
 docs
 scripts
+RELEASING.md
 
 # Gradle
 /.gradle/
