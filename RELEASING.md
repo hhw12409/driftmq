@@ -57,20 +57,31 @@ gpg --armor --export-secret-keys AAAABBBBCCCCDDDD
 
 ---
 
-## D. 릴리스하기 (매번)
+## D. 릴리스하기 (매번) — 한 줄
 
-1. `gradle.properties` 의 `VERSION_NAME` 을 올린다 (예: `0.1.0` → `0.2.0`).
-   - `0.2.0-SNAPSHOT` 처럼 `-SNAPSHOT` 이 붙으면 서명 없이 snapshot 저장소로 간다.
-2. 커밋하고 태그를 만든다 — **태그는 `v` + VERSION_NAME 과 정확히 일치**해야 한다 (워크플로가 검증함):
-   ```bash
-   git commit -am "Release 0.2.0"
-   git tag v0.2.0
-   git push origin main --tags
-   ```
-3. `Release` 워크플로가 실행된다:
-   - 전체 테스트 → `publishAndReleaseToMavenCentral` (`SONATYPE_AUTOMATIC_RELEASE=true` 라 스테이징 후 자동 릴리스)
-   - `build/libs/driftmq-0.2.0.jar` 를 GitHub Release 에 첨부
-4. Maven Central 인덱싱은 최초 배포 후 몇 시간, 이후 릴리스는 ~30분.
+```bash
+./scripts/release.sh 0.2.0
+```
+
+스크립트가 하는 일:
+
+1. 사전 검증 — `main` 브랜치, 작업 트리 clean, `origin/main` 과 동기화, 태그 `v0.2.0` 미존재
+2. `gradle.properties` 의 `VERSION_NAME` + README 의존성 스니펫(`driftmq:0.2.0`, `<version>0.2.0`)을 일괄 수정
+3. `./gradlew build` 로 로컬에서 59개 테스트 통과 확인 (`--skip-build` 로 생략 가능)
+4. `Release 0.2.0` 커밋 + annotated 태그 `v0.2.0` 생성 + `git push origin main v0.2.0`
+
+옵션:
+- `--no-push` — 커밋·태그만 만들고 멈춤 (되돌리기 명령을 출력해 줌)
+- `--skip-build` — 로컬 빌드 검증 생략, CI 만 신뢰
+
+push 후 `Release` 워크플로가:
+- 전체 테스트 → `publishAndReleaseToMavenCentral` (`SONATYPE_AUTOMATIC_RELEASE=true` 라 스테이징 후 자동 릴리스)
+- `driftmq-0.2.0.jar` + 버전 무관 이름 `driftmq.jar` 를 GitHub Release 에 첨부
+  (`releases/latest/download/driftmq.jar` 가 항상 최신을 가리킴)
+
+Maven Central 인덱싱은 최초 배포 후 몇 시간, 이후 릴리스는 ~30분.
+
+> `-SNAPSHOT` 버전(예: `0.3.0-SNAPSHOT`)은 서명 없이 snapshot 저장소로 간다. 스크립트는 형식만 통과시키고 태그를 만드니, snapshot 은 보통 로컬 수동 배포(아래)로 올린다.
 
 ## 로컬에서 수동 배포 (CI 없이)
 

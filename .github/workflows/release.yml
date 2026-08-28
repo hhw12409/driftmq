@@ -36,6 +36,7 @@ jobs:
           VER="${GITHUB_REF_NAME#v}"
           mkdir -p dist
           cp "build/libs/driftmq-${VER}.jar" "dist/driftmq-${VER}.jar"
+          cp "build/libs/driftmq-${VER}.jar" "dist/driftmq.jar"   # 버전 무관 이름 (latest/download 용)
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

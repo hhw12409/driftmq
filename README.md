@@ -83,8 +83,8 @@ dependencies {
 ### 브로커 실행 파일 — GitHub Releases
 
 ```bash
-curl -LO https://github.com/hhw12409/driftmq/releases/latest/download/driftmq-0.1.0.jar
-java -jar driftmq-0.1.0.jar start --data-dir ./data --port 7644
+curl -LO https://github.com/hhw12409/driftmq/releases/latest/download/driftmq.jar
+java -jar driftmq.jar start --data-dir ./data --port 7644
 ```
 
 의존성이 없으므로 이 JAR 자체가 실행 가능한 fat JAR 이다.
