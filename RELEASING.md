@@ -59,7 +59,7 @@ gpg --armor --export-secret-keys AAAABBBBCCCCDDDD
 
 ## D. 릴리스하기 (매번)
 
-예: `0.1.0` → `0.2.0`.
+예: `0.1.0` → `0.2.0`. (첫 릴리스는 `gradle.properties` 가 이미 `0.1.0` 이므로 1~2 단계 건너뛰고 바로 태그.)
 
 1. 버전을 올린다:
    - `gradle.properties` 의 `VERSION_NAME=0.2.0`
