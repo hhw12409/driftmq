@@ -62,6 +62,9 @@ DriftMQ 는 다음을 **하지 않는다**:
 
 ### 라이브러리 (클라이언트/임베디드 브로커) — Maven Central
 
+📦 **[central.sonatype.com/artifact/io.github.hhw12409/driftmq](https://central.sonatype.com/artifact/io.github.hhw12409/driftmq)**
+— 모든 버전 · [Gradle/Maven/sbt 스니펫](https://central.sonatype.com/artifact/io.github.hhw12409/driftmq/dependencies)
+
 **Gradle** (`build.gradle.kts`)
 ```kotlin
 dependencies {
