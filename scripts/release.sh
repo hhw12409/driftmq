@@ -45,10 +45,23 @@ echo "  현재 $CURRENT  →  릴리스 $VERSION"
 [[ "$VERSION" != "$CURRENT" ]] || die "gradle.properties 가 이미 $VERSION 이다."
 
 # ── 버전 반영 ───────────────────────────────────────────────────────────────
-# BSD/GNU sed 양쪽 호환을 위해 임시파일 방식
-bump() { # file  regex-from  to
-  local f="$1" from="$2" to="$3"
-  perl -pi -e "s/\Q$from\E/$to/g" "$f"
+# awk index/substr 로 정규식 없이 리터럴 치환 (BSD/GNU 공통, </version> 같은 슬래시 안전).
+bump() { # file  literal-from  literal-to
+  local f="$1" tmp
+  tmp="$(mktemp)"
+  FROM="$2" TO="$3" awk '
+    BEGIN { from = ENVIRON["FROM"]; to = ENVIRON["TO"]; n = 0 }
+    {
+      out = ""; line = $0
+      while ((i = index(line, from)) > 0) {
+        out = out substr(line, 1, i - 1) to
+        line = substr(line, i + length(from))
+        n++
+      }
+      print out line
+    }
+    END { if (n == 0) { print "  ⚠ 치환 대상 없음: " from > "/dev/stderr" } }
+  ' "$f" > "$tmp" && mv "$tmp" "$f"
 }
 bump gradle.properties "VERSION_NAME=$CURRENT" "VERSION_NAME=$VERSION"
 bump README.md "io.github.hhw12409:driftmq:$CURRENT" "io.github.hhw12409:driftmq:$VERSION"
