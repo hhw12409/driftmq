@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# DriftMQ 실행 래퍼. `./driftmq start` 등. (fat JAR + JDK 21)
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")" && pwd)"
+JAVA="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+if [ ! -f "$DIR/driftmq.jar" ]; then
+  echo "driftmq.jar not found — run ./build.sh first" >&2
+  exit 1
+fi
+exec "$JAVA" -jar "$DIR/driftmq.jar" "$@"

@@ -1,0 +1,9 @@
+/out/
+/driftmq.jar
+/data/
+*.class
+.DS_Store
+/bench/results/
+_workspace
+_workspace_*
+docs
