@@ -9,7 +9,12 @@
 
 # DriftMQ
 
-**경량 단일 노드 메시지 브로커.** 순수 Java 21 — 외부 의존성 0, 빌드 도구 0.
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.hhw12409/driftmq?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.hhw12409/driftmq)
+[![CI](https://github.com/hhw12409/driftmq/actions/workflows/ci.yml/badge.svg)](https://github.com/hhw12409/driftmq/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![JDK](https://img.shields.io/badge/JDK-21-orange.svg)](https://adoptium.net/)
+
+**경량 단일 노드 메시지 브로커.** 순수 Java 21 — 런타임 의존성 0.
 append-only 로그에 저장하고, 크래시에서 복구하고, at-least-once 로 전달한다.
 
 > **Simple first, distributed later.** 처음부터 Kafka 를 만들지 않는다.
@@ -37,7 +42,7 @@ append-only 로그에 저장하고, 크래시에서 복구하고, at-least-once 
 
 | | |
 |---|---|
-| 🪶 **가볍다** | JAR 하나 + 셸 스크립트. JDK 21 만 있으면 끝. Gradle/Maven·Netty·DB 없음 |
+| 🪶 **가볍다** | 라이브러리 JAR 하나. **런타임 의존성 0** — Netty·DB·로깅 프레임워크 없음 |
 | 💾 **안 잃는다** | publish 마다 fsync — 응답을 받았으면 디스크에 확정된 것. `kill -9` 후 부분 프레임은 CRC 로 감지·truncate |
 | 🔁 **at-least-once** | ACK 안 하면 재전달. consumer 는 멱등하게 (`offset` = 중복 감지 키) |
 | 🧵 **단순한 서버** | 연결 1개 = 가상 스레드 1개. 비동기 콜백 지옥 없음 |
@@ -53,6 +58,39 @@ DriftMQ 는 다음을 **하지 않는다**:
 
 ---
 
+## ✦ 설치
+
+### 라이브러리 (클라이언트/임베디드 브로커) — Maven Central
+
+**Gradle** (`build.gradle.kts`)
+```kotlin
+dependencies {
+    implementation("io.github.hhw12409:driftmq:0.1.0")
+}
+```
+
+**Maven** (`pom.xml`)
+```xml
+<dependency>
+  <groupId>io.github.hhw12409</groupId>
+  <artifactId>driftmq</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
+전이 의존성이 없다 — 이 JAR 하나가 전부다.
+
+### 브로커 실행 파일 — GitHub Releases
+
+```bash
+curl -LO https://github.com/hhw12409/driftmq/releases/latest/download/driftmq-0.1.0.jar
+java -jar driftmq-0.1.0.jar start --data-dir ./data --port 7644
+```
+
+의존성이 없으므로 이 JAR 자체가 실행 가능한 fat JAR 이다.
+
+---
+
 ## ✦ 빠른 시작
 
 ### 0. 요구사항
@@ -62,9 +100,14 @@ DriftMQ 는 다음을 **하지 않는다**:
 ### 1. 빌드 & 테스트
 
 ```bash
-./build.sh     # javac → driftmq.jar  (외부 의존성 0)
-./test.sh      # 단위 + MVP 인수 시나리오 — 59개
+./gradlew build          # 컴파일 + 테스트 + driftmq JAR
+# 또는 Gradle 없이 순수 JDK 로:
+./build.sh               # javac → driftmq.jar
+./test.sh                # 단위 + MVP 인수 시나리오 — 59개
 ```
+
+두 경로 모두 유지된다. `./gradlew` 는 배포·의존성 관리용, `build.sh` 는 "JDK 만 있으면 된다"는
+원칙을 지키는 최소 경로다.
 
 ### 2. 브로커 실행
 
@@ -201,6 +244,10 @@ src/main/java/io/driftmq/
 ├── bench/      Bench
 └── example/    Demo
 src/test/java/  59개 테스트 (단위 + MVP 시나리오 + 정확성)
+
+build.gradle.kts · gradle.properties   배포/의존성 (Maven Central)
+build.sh · test.sh · driftmq           순수 JDK 경로 (Gradle 불필요)
+RELEASING.md                           릴리스 절차
 ```
 
 ---

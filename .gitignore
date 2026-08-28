@@ -7,3 +7,13 @@
 _workspace
 _workspace_*
 docs
+
+# Gradle
+/.gradle/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 로컬 배포 인증값 (절대 커밋 금지)
+/secring.gpg
+*.gpg
+local.properties

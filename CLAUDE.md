@@ -15,3 +15,4 @@
 |------|----------|------|------|
 | 2026-08-28 | 초기 구성 (에이전트 5, 스킬 6) | 전체 | - |
 | 2026-08-28 | 기본 스택 추천 Go → Java 21 | architect, mq-architecture, broker-implementation, driftmq-orchestrator, mq-qa-verification | 팀이 사용 가능한 언어가 Java뿐 |
+| 2026-08-28 | 오픈소스 배포 인프라: Gradle 빌드 + Maven Central(io.github.hhw12409) + Apache-2.0 + CI/Release 워크플로 | 저장소 루트 (build.gradle.kts, gradle.properties, LICENSE, RELEASING.md, .github/) | 라이브러리를 의존성으로 배포하려면 서명된 POM·sources/javadoc 필요. build.sh 순수 JDK 경로는 유지 |
